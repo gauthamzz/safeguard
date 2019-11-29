@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Person, lookupProfile } from "blockstack";
-import { Skeleton, Switch, Card, Icon, Avatar, Row, Col } from "antd";
+import { Skeleton, Switch, Modal, Card, Icon, Avatar, Row, Col } from "antd";
 
 const { Meta } = Card;
+const { confirm } = Modal;
 
 const avatarFallbackImage =
   "https://s3.amazonaws.com/onename/avatar-placeholder.png";
@@ -61,14 +62,34 @@ export default class Profile extends Component {
     const { userSession } = this.props;
     let logins = this.state.logins;
 
-    let login = {
-      id: this.state.statusIndex++,
-      url: urlText.trim(),
-      password: passwordText.trim(),
-      created_at: Date.now()
-    };
+    if (urlText.trim() !== "" && passwordText.trim() !== "") {
+      let login = {
+        id: this.state.statusIndex++,
+        url: urlText.trim(),
+        password: passwordText.trim(),
+        created_at: Date.now()
+      };
 
-    logins.unshift(login);
+      logins.unshift(login);
+      const options = { encrypt: false };
+      userSession
+        .putFile("loginss.json", JSON.stringify(logins), options)
+        .then(() => {
+          this.setState({
+            logins: logins
+          });
+        });
+    }
+  }
+
+  deleteLogin(urlText, passwordText) {
+    const { userSession } = this.props;
+    let logins = this.state.logins;
+
+    logins = logins.filter(
+      login => login.url != urlText && login.password != passwordText
+    );
+
     const options = { encrypt: false };
     userSession
       .putFile("loginss.json", JSON.stringify(logins), options)
@@ -130,6 +151,18 @@ export default class Profile extends Component {
           this.setState({ isLoading: false });
         });
     }
+  }
+
+  showConfirm(urlText, passwordText) {
+    confirm({
+      title: "Do you want to delete these items?",
+      content:
+        "This will delete the associated accounts and cannot be used afterwards!",
+      onOk: () => {
+        this.deleteLogin(urlText, passwordText);
+      },
+      onCancel: () => {}
+    });
   }
 
   isLocal() {
@@ -205,13 +238,22 @@ export default class Profile extends Component {
               <Row gutter={[24, 24]}>
                 {this.state.logins.map(status => (
                   <div className="status" key={status.id}>
-                    <Col span={10} >
+                    <Col span={10}>
                       <Card
                         style={{ margin: 16 }}
                         actions={[
-                         <a href={`https://${status.url}`} target="_blank" >  <Icon type="link" key="link" /> </a>,
+                          <a href={`https://${status.url}`} target="_blank">
+                            {" "}
+                            <Icon type="link" key="link" />{" "}
+                          </a>,
                           <Icon type="edit" key="edit" />,
-                          <Icon type="delete" key="delete" />
+                          <Icon
+                            type="delete"
+                            key="delete"
+                            onClick={() =>
+                              this.showConfirm(status.url, status.password)
+                            }
+                          />
                         ]}
                       >
                         <Meta
