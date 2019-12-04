@@ -35,7 +35,7 @@ export default class App extends Component {
             : 
             <Switch>
               <Route 
-                path='/:username?' 
+                path='/:search?' 
                 render={
                   routeProps => 
                     <Profile 

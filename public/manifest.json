@@ -1,6 +1,6 @@
 {
-  "name": "Hello, Blockstack",
-  "description": "A simple demo of Blockstack Auth",
+  "name": "Safeguard",
+  "description": "Blockchain based password manager",
   "icons": [
     {
     "src": "favicon.ico",
