@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Person, lookupProfile } from "blockstack";
+import { Person } from "blockstack";
 import {
   Skeleton,
   Menu,
@@ -13,19 +13,27 @@ import {
   Button,
   Input,
   Tooltip,
-  Result,
   Empty,
   PageHeader,
-  Switch,
-  Typography
+  Typography,
+  Slider,
+  Checkbox,
+  InputNumber,
+  Progress,
+  Divider,
+  Alert,
+  Collapse
 } from "antd";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import generatePassword from "password-generator";
+import zxcvbn from "zxcvbn";
+import copy from "copy-to-clipboard";
 
 const { Meta } = Card;
 const { confirm } = Modal;
 const { SubMenu } = Menu;
-const { Search } = Input;
-const { Paragraph, Text } = Typography;
+const { Text, Title } = Typography;
+const { Panel } = Collapse;
 
 const avatarFallbackImage =
   "https://s3.amazonaws.com/onename/avatar-placeholder.png";
@@ -44,7 +52,7 @@ export default class Profile extends Component {
         }
       },
       username: "",
-      newUrl: "",
+      newUrl: this.props.match.params.search,
       newPassword: "",
       newUsername: "",
       logins: [],
@@ -53,12 +61,22 @@ export default class Profile extends Component {
       isLoading: false,
       visible: false,
       copied: false,
-      noSearchResults: false
+      noSearchResults: false,
+      showPasswordGeneratorModal: false,
+      generatedPasswordRating: 2.0,
+      passwordGenerated: "",
+      generatedPasswordMemorable: true,
+      generatedPasswordLength: 11,
+      generatePasswordFeedback: ""
     };
   }
 
   componentDidMount() {
     this.fetchData();
+    this.getGeneratePassword(
+      this.state.generatedPasswordLength,
+      this.state.generatedPasswordMemorable
+    );
   }
 
   componentWillMount() {
@@ -178,8 +196,6 @@ export default class Profile extends Component {
         .finally(() => {
           this.setState({ isLoading: false });
         });
-
-      console.log(this.props.match.params.search);
     }
   }
 
@@ -208,6 +224,14 @@ export default class Profile extends Component {
     );
   };
 
+  getProgressStatus = percentage => {
+    if (percentage < 41) {
+      return "exception";
+    } else if (percentage < 81) {
+      return "active";
+    }
+  };
+
   handleCancel = () => {
     console.log("Clicked cancel button");
     this.setState({
@@ -215,13 +239,102 @@ export default class Profile extends Component {
     });
   };
 
-  handleClick = e => {
-    console.log("click ", e);
-  };
-
   isLocal() {
     return this.props.match.params.username ? false : true;
   }
+
+  generatedPasswordElement = () => {
+    return (
+      <div>
+        <Title
+          style={{
+            textAlign: "center",
+            padding: 20
+          }}
+          copyable={{ text: this.state.passwordGenerated }}
+          editable={{
+            onChange: text => {
+              this.setState({
+                passwordGenerated: text,
+                generatedPasswordRating: zxcvbn(text).score,
+                newPassword: text
+              });
+            }
+          }}
+          ellipsis="true"
+          level={4}
+        >
+          {this.state.passwordGenerated}
+        </Title>
+
+        <Divider dashed />
+        <Text strong="true">
+          Customize password
+          <Tooltip title="Click to refresh">
+            <Icon
+              type="redo"
+              key="redo"
+              style={{ color: "#1890FF" }}
+              onClick={() =>
+                this.getGeneratePassword(
+                  this.state.generatedPasswordLength,
+                  this.state.generatedPasswordMemorable
+                )
+              }
+            />
+          </Tooltip>
+        </Text>
+
+        <Row style={{ marginTop: 10 }}>
+          <Col xs={4}>
+            <Progress
+              width={40}
+              type="circle"
+              percent={(this.state.generatedPasswordRating + 1) / 0.05}
+              status={this.getProgressStatus(
+                (this.state.generatedPasswordRating + 1) / 0.05
+              )}
+            />
+          </Col>
+
+          <Col xs={8}>
+            <Checkbox
+              checked={this.state.generatedPasswordMemorable}
+              onChange={() =>
+                this.getGeneratePassword(
+                  this.state.generatedPasswordLength,
+                  !this.state.generatedPasswordMemorable
+                )
+              }
+            >
+              Easy to remember
+            </Checkbox>
+          </Col>
+
+          <Col xs={12}>
+            <Slider
+              value={this.state.generatedPasswordLength}
+              min={1}
+              max={20}
+              onChange={text =>
+                this.getGeneratePassword(
+                  text,
+                  this.state.generatedPasswordMemorable
+                )
+              }
+            />
+          </Col>
+        </Row>
+        {this.state.generatePasswordFeedback.length !== 0 && (
+          <Alert
+            message={this.state.generatePasswordFeedback}
+            type="info"
+            style={{ marginTop: 20 }}
+          />
+        )}
+      </div>
+    );
+  };
 
   cardElement = status => {
     // 576 is xs in ant design
@@ -273,6 +386,25 @@ export default class Profile extends Component {
     ];
   };
 
+  getGeneratePassword = (value, memorable) => {
+    const password = generatePassword(value, memorable);
+    const gen = zxcvbn(password);
+    this.setState({
+      passwordGenerated: password,
+      generatedPasswordLength: value,
+      generatedPasswordMemorable: memorable,
+      generatedPasswordRating: gen.score,
+      generatePasswordFeedback: gen.feedback.suggestions,
+      newPassword: password
+    });
+  };
+
+  togglePasswordGeneratorModal = () => {
+    this.setState({
+      showPasswordGeneratorModal: !this.state.showPasswordGeneratorModal
+    });
+  };
+
   HeaderElement = () => {
     const isIframe = window.innerWidth < 576 ? true : false;
     if (isIframe) {
@@ -298,7 +430,7 @@ export default class Profile extends Component {
         subTitle="Blockchain based password manager"
         extra={[
           <Button
-            size="medium"
+            key="add-new-password"
             type="dashed"
             icon="plus"
             onClick={this.showModal}
@@ -328,7 +460,6 @@ export default class Profile extends Component {
         <Row>
           <Col md={4} sm={0} xs={0}>
             <Menu
-              onClick={this.handleClick}
               defaultOpenKeys={["sub1"]}
               defaultSelectedKeys={["web"]}
               mode="inline"
@@ -364,6 +495,14 @@ export default class Profile extends Component {
                   </Menu.Item>
                 </Menu.ItemGroup>
               </SubMenu>
+              <Menu.Item key="generate-password">
+                {this.isLocal() && (
+                  <a onClick={this.togglePasswordGeneratorModal}>
+                    <Icon type="key" />
+                    Generate Password
+                  </a>
+                )}
+              </Menu.Item>
               <Menu.Item key="2">
                 {this.isLocal() && (
                   <a onClick={handleSignOut.bind(this)}>
@@ -384,6 +523,7 @@ export default class Profile extends Component {
                       visible={visible}
                       onCancel={this.handleCancel}
                       onOk={e => this.handleNewLoginSubmit(e)}
+                      style={{ top: 20 }}
                     >
                       url
                       <Input
@@ -412,13 +552,33 @@ export default class Profile extends Component {
                           />
                         }
                       />
-                      password
+                      <Text>Password</Text>
                       <Input.Password
                         placeholder="input password"
                         value={this.state.newPassword}
                         onChange={e => this.handleNewPasswordChange(e)}
                         style={{ marginBottom: 10 }}
                       />
+                      <Collapse bordered={false}>
+                        <Panel header="Generate Password" key="gen">
+                          {this.generatedPasswordElement()}
+                        </Panel>
+                      </Collapse>
+                    </Modal>
+                  )}
+
+                  {this.isLocal() && (
+                    <Modal
+                      title="Generate Secure Passwords"
+                      visible={this.state.showPasswordGeneratorModal}
+                      onCancel={this.togglePasswordGeneratorModal}
+                      onOk={() => {
+                        copy(this.state.passwordGenerated);
+                        message.success("Generated password copied")
+                        this.togglePasswordGeneratorModal();
+                      }}
+                    >
+                      {this.generatedPasswordElement()}
                     </Modal>
                   )}
                   <div className="col-md-12 logins">
@@ -538,7 +698,7 @@ export default class Profile extends Component {
                                       type="secondary"
                                       copyable={{ text: status.password }}
                                       style={{
-                                        WebkitTextSecurity: "disc",
+                                        WebkitTextSecurity: "disc"
                                       }}
                                     >
                                       {status.password}
