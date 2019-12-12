@@ -15,11 +15,15 @@
     "antd": "^3.25.2",
     "blockstack": "^19.2.5",
     "password-generator": "^2.2.3",
+    "rc-queue-anim": "^1.8.3",
+    "rc-scroll-anim": "^2.7.4",
     "react": "^16.8.6",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.8.6",
+    "react-particles-js": "^2.7.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "3.0.1",
+    "react-typed": "^1.2.0",
     "zxcvbn": "^4.4.2"
   },
   "scripts": {

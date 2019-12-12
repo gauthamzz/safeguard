@@ -28,6 +28,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import generatePassword from "password-generator";
 import zxcvbn from "zxcvbn";
 import copy from "copy-to-clipboard";
+import { stat } from "fs";
 
 const { Meta } = Card;
 const { confirm } = Modal;
@@ -67,7 +68,9 @@ export default class Profile extends Component {
       passwordGenerated: "",
       generatedPasswordMemorable: true,
       generatedPasswordLength: 11,
-      generatePasswordFeedback: ""
+      generatePasswordFeedback: "",
+      sharePasswordModal: false,
+      sharePasswordBlockstackId: ""
     };
   }
 
@@ -105,19 +108,37 @@ export default class Profile extends Component {
     this.setState({ newUsername: event.target.value });
   }
 
-  handleNewLoginSubmit(event) {
-    this.saveNewLogin(
-      this.state.newUrl,
-      this.state.newUsername,
-      this.state.newPassword
-    );
+  handleNewShareBlockstackId(event) {
     this.setState({
-      newUrl: "",
-      newPassword: "",
-      newUsername: "",
-      visible: false
+      sharePasswordBlockstackId : event.target.value
     });
-    message.success("New Login added successfully");
+  }
+
+  handleSharePasswordSubmit(url, username, password) {
+    message.info(this.state.sharePasswordBlockstackId + "is going to get the password for" + url + username + password)
+  }
+
+  handleNewLoginSubmit(event) {
+    if (
+      this.state.newPassword.length !== 0 &&
+      this.state.newUsername.length !== 0 &&
+      this.state.newPassword.length !== 0
+    ) {
+      this.saveNewLogin(
+        this.state.newUrl,
+        this.state.newUsername,
+        this.state.newPassword
+      );
+      this.setState({
+        newUrl: "",
+        newPassword: "",
+        newUsername: "",
+        visible: false
+      });
+      message.success("New Login added successfully");
+    } else {
+      message.error("Required field empty");
+    }
   }
 
   saveNewLogin(urlText, usernameText, passwordText) {
@@ -233,7 +254,6 @@ export default class Profile extends Component {
   };
 
   handleCancel = () => {
-    console.log("Clicked cancel button");
     this.setState({
       visible: false
     });
@@ -375,7 +395,36 @@ export default class Profile extends Component {
       <a href={`https://${status.url}`} target="_blank">
         {" "}
         <Icon type="link" key="link" />{" "}
+        {this.state.sharePasswordModal && (
+          <Modal
+            title="Share password"
+            visible={this.state.sharePasswordModal}
+            onOk={e => this.handleSharePasswordSubmit(status.url, status.username, status.password)}
+            onCancel={() => {
+              this.setState({
+                sharePasswordModal: !this.state.sharePasswordModal
+              });
+            }}
+          >
+            <Input
+              placeholder="Blockstack id"
+              value={this.state.sharePasswordBlockstackId}
+              onChange={e => this.handleNewShareBlockstackId(e)}
+            />
+          </Modal>
+        )}
       </a>,
+      <Icon
+        xs={0}
+        lg={1}
+        type="share-alt"
+        key="share-alt"
+        onClick={() =>
+          this.setState({
+            sharePasswordModal: !this.state.sharePasswordModal
+          })
+        }
+      />,
       <Icon
         xs={0}
         lg={1}
@@ -574,7 +623,7 @@ export default class Profile extends Component {
                       onCancel={this.togglePasswordGeneratorModal}
                       onOk={() => {
                         copy(this.state.passwordGenerated);
-                        message.success("Generated password copied")
+                        message.success("Generated password copied");
                         this.togglePasswordGeneratorModal();
                       }}
                     >
