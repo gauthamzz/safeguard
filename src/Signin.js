@@ -34,7 +34,7 @@ export default class Signin extends Component {
           </div>
           <Particles
             style={{
-              position: "fixed",
+              position: "absolute",
               width: "100%",
               height: "100%",
               zIndex: -1,
@@ -154,7 +154,7 @@ export default class Signin extends Component {
           <div
             key="2"
             style={{
-              marginTop: "15rem",
+              marginTop: "11rem",
               textAlign: "center"
             }}
           >
@@ -164,7 +164,7 @@ export default class Signin extends Component {
                   fontSize: "4rem"
                 }}
               >
-                Protect and remember your passwords <br /> better than you
+                Protect and remember <br /> your passwords for you
               </Title>
               <Text
                 style={{
@@ -259,87 +259,15 @@ export default class Signin extends Component {
               src="https://images.unsplash.com/photo-1531946405499-671fc3a8bbab?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80"
             ></img>
           </div> */}
-          <div key="4">
-            <Row
-              style={{
-                marginBottom: "10rem"
-              }}
-            >
-              <Col span={6} offset={3}>
-                <Card
-                  style={{
-                    width: 400,
-                    border: "none",
-                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)"
-                  }}
-                >
-                  <Icon
-                    type="block"
-                    style={{
-                      fontSize: "4rem",
-                      color: "#000",
-                      margin: "1rem"
-                    }}
-                  />
-                  <br />
-                  <Title level={4}>Powered by Blockchain</Title>
-                  <Text>
-                    Store your password using the technology behind BitCoin and
-                    other cryptocurrencies
-                  </Text>
-                </Card>
-              </Col>
-              <Col span={6}>
-                <Card
-                  style={{
-                    width: 400,
-                    border: "none",
-                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)"
-                  }}
-                >
-                  <Icon
-                    type="lock"
-                    style={{
-                      fontSize: "4rem",
-                      color: "#000",
-                      margin: "1rem"
-                    }}
-                  />
-                  <br />
-                  <Title level={4}>Secure and easy</Title>
-                  <Text>
-                    Use the app with ease using the chrome extension for
-                    autofill and many more
-                  </Text>
-                </Card>
-              </Col>
-              <Col span={6}>
-                <Card
-                  style={{
-                    width: 400,
-                    border: "none",
-                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)"
-                  }}
-                >
-                  <Icon
-                    type="database"
-                    style={{
-                      fontSize: "4rem",
-                      color: "#000",
-                      margin: "1rem"
-                    }}
-                  />
-                  <br />
-                  <Title level={4}>Own your own data</Title>
-                  <Text>
-                    Your data is owned by yourself and not some big fancy
-                    company trying to sell it.
-                  </Text>
-                </Card>
-              </Col>
-            </Row>
+          <div
+            key="4"
+            style={{
+              paddingTop: "3rem",
+              backgroundImage: ` url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.04'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+            }}
+          >
             <Row>
-              <Col span={6} offset={4}>
+              <Col span={8} offset={2}>
                 <Title
                   style={{
                     fontSize: "3.125rem"
@@ -350,7 +278,8 @@ export default class Signin extends Component {
                 <Text
                   style={{
                     fontSize: "1.25rem",
-                    marginBottom: "4rem"
+                    marginBottom: "4rem",
+                    marginTop: "4rem"
                   }}
                 >
                   Save all your passwords at one place and autofill them with
@@ -359,15 +288,16 @@ export default class Signin extends Component {
                 <img src="https://res.cloudinary.com/matrimonal/image/upload/v1576177295/DogJumpDoodle_aq6eay.svg" />
               </Col>
               <Col
-                span={6}
-                offset={2}
+                span={8}
+                offset={4}
                 style={{
                   textAlign: "center"
                 }}
               >
                 <img
                   style={{
-                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)"
+                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                    width: "70%"
                   }}
                   src="https://res.cloudinary.com/matrimonal/image/upload/v1576145363/Screenshot_2019-12-12_at_3.22.30_PM_qyondc.png"
                 />
@@ -383,16 +313,16 @@ export default class Signin extends Component {
             }}
           >
             <Row>
-              <Col span={12}>
+              <Col span={8} offset={2}>
                 <img
                   style={{
                     boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
-                    width: 450
+                    width: "70%"
                   }}
                   src="https://res.cloudinary.com/matrimonal/image/upload/v1576148077/Screenshot_2019-12-05_at_11.35.56_PM_k34w5w.png"
                 />
               </Col>
-              <Col span={6} offset={2}>
+              <Col span={8} offset={4}>
                 <Title
                   style={{
                     fontSize: "3.125rem"
@@ -413,6 +343,101 @@ export default class Signin extends Component {
                   src="https://res.cloudinary.com/matrimonal/image/upload/v1576177292/LayingDoodle_urxeda.svg"
                   alt=""
                 />
+              </Col>
+            </Row>
+          </div>
+          <div key="cards-section">
+            <Row
+              style={{
+                marginBottom: "10rem"
+              }}
+            >
+              <Col span={6} offset={3}>
+                <Card
+                  style={{
+                    width: "80%",
+                    border: "none",
+                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                    borderRadius: "5px",
+                    transition: "box-shadow 0.3s ease, border 0.3s ease",
+                    backgroundSize: "cover",
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230099ff' fill-opacity='0.07' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")`
+                  }}
+                >
+                  <Icon
+                    type="block"
+                    style={{
+                      fontSize: "3.5rem",
+                      color: "#0099ff",
+                      margin: "1rem"
+                    }}
+                  />
+                  <br />
+                  <Title level={4}>Powered by Blockchain</Title>
+                  <Text>
+                    Store your password using the technology behind BitCoin and
+                    other cryptocurrencies
+                  </Text>
+                </Card>
+              </Col>
+              <Col span={6}>
+                <Card
+                  style={{
+                    width: "80%",
+                    border: "none",
+                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                    borderRadius: "5px",
+                    transition: "box-shadow 0.3s ease, border 0.3s ease",
+                    backgroundSize: "cover",
+                    backgroundPosition: "bottom",
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230099ff' fill-opacity='0.07' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")`
+                  }}
+                >
+                  <Icon
+                    type="lock"
+                    style={{
+                      fontSize: "3.5rem",
+                      color: "#0099ff",
+                      margin: "1rem"
+                    }}
+                  />
+                  <br />
+                  <Title level={4}>Secure and easy</Title>
+                  <Text>
+                    Use the app with ease using the chrome extension for
+                    autofill and many more
+                  </Text>
+                </Card>
+              </Col>
+              <Col span={6}>
+                <Card
+                  style={{
+                    width: "80%",
+                    border: "none",
+                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                    borderRadius: "5px",
+                    transition: "box-shadow 0.3s ease, border 0.3s ease",
+                    backgroundSize: "cover",
+                    backgroundPosition: "left",
+
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230099ff' fill-opacity='0.07' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")`
+                  }}
+                >
+                  <Icon
+                    type="database"
+                    style={{
+                      fontSize: "3.5rem",
+                      color: "#0099ff",
+                      margin: "1rem"
+                    }}
+                  />
+                  <br />
+                  <Title level={4}>Own your own data</Title>
+                  <Text>
+                    Your data is owned by yourself and not some big fancy
+                    company trying to sell it.
+                  </Text>
+                </Card>
               </Col>
             </Row>
           </div>
