@@ -29,6 +29,7 @@ import generatePassword from "password-generator";
 import zxcvbn from "zxcvbn";
 import copy from "copy-to-clipboard";
 import { stat } from "fs";
+import axios from "axios";
 
 const { Meta } = Card;
 const { confirm } = Modal;
@@ -110,12 +111,18 @@ export default class Profile extends Component {
 
   handleNewShareBlockstackId(event) {
     this.setState({
-      sharePasswordBlockstackId : event.target.value
+      sharePasswordBlockstackId: event.target.value
     });
   }
 
   handleSharePasswordSubmit(url, username, password) {
-    message.info(this.state.sharePasswordBlockstackId + "is going to get the password for" + url + username + password)
+    message.info(
+      this.state.sharePasswordBlockstackId +
+        "is going to get the password for" +
+        url +
+        username +
+        password
+    );
   }
 
   handleNewLoginSubmit(event) {
@@ -140,6 +147,27 @@ export default class Profile extends Component {
       message.error("Required field empty");
     }
   }
+
+  // setPublicInfo() {
+  //   console.log(localStorage.getItem("STORE_PUBLIC_KEY"))
+  //   const { userSession } = this.props;
+  //   let userData = userSession.loadUserData();
+  //   if (!userData) {
+  //     return;
+  //   }
+  //   const publicKey = userSession.getPublicKeyFromPrivate(
+  //     userData.appPrivateKey
+  //   );
+  //   userSession
+  //     .putFile("info.json", JSON.stringify(publicKey), { encrypt: false })
+  //     .then(() => {
+  //       localStorage.setItem("STORE_PUBLIC_KEY", true)
+  //     })
+  //     .catch(e => {
+  //       // eslint-disable-next-line no-console
+  //       console.log(e);
+  //     });
+  // }
 
   saveNewLogin(urlText, usernameText, passwordText) {
     const { userSession } = this.props;
@@ -184,6 +212,23 @@ export default class Profile extends Component {
       });
     message.success("Item has been deleted");
   }
+
+  // fetchPublicInfo() {
+  //   const { userSession } = this.props;
+  //   this.setState({ isLoading: true });
+  //   if (this.isLocal) {
+  //     const options = { decrypt: false };
+  //     userSession
+  //       .getFile("info.json", options)
+  //       .then(file => {
+  //         var info = JSON.parse(file || "[]");
+  //         console.log(info);
+  //       })
+  //       .finally(() => {
+  //         this.setState({ isLoading: false });
+  //       });
+  //   }
+  // }
 
   fetchData() {
     const { userSession } = this.props;
@@ -399,7 +444,13 @@ export default class Profile extends Component {
           <Modal
             title="Share password"
             visible={this.state.sharePasswordModal}
-            onOk={e => this.handleSharePasswordSubmit(status.url, status.username, status.password)}
+            onOk={e =>
+              this.handleSharePasswordSubmit(
+                status.url,
+                status.username,
+                status.password
+              )
+            }
             onCancel={() => {
               this.setState({
                 sharePasswordModal: !this.state.sharePasswordModal
@@ -454,6 +505,26 @@ export default class Profile extends Component {
     });
   };
 
+  sendLoginEmail = () => {
+    console.log("test");
+    // axios.post(
+    //   `https://liver-impala-9566.twil.io/send`,
+    // JSON.stringify({
+    //   subject: "yo",
+    //   message: "hey"
+    // })
+    // )
+
+    fetch(`https://liver-impala-9566.twil.io/send`, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify({
+        subject: "yo",
+        message: "hey"
+      })
+    }).then(e => console.log(e));
+  };
+
   HeaderElement = () => {
     const isIframe = window.innerWidth < 576 ? true : false;
     if (isIframe) {
@@ -477,6 +548,9 @@ export default class Profile extends Component {
       <PageHeader
         title="🛡Safeguard"
         subTitle="Blockchain based password manager"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='Artboard-5' fill='%230099ff' fill-opacity='0.07' fill-rule='nonzero'%3E%3Cpath d='M6 18h12V6H6v12zM4 4h16v16H4V4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}
         extra={[
           <Button
             key="add-new-password"
@@ -559,6 +633,12 @@ export default class Profile extends Component {
                     Logout
                   </a>
                 )}
+              </Menu.Item>
+              <Menu.Item key="2">
+                <a onClick={this.sendLoginEmail}>
+                  <Icon type="mail" />
+                  send email
+                </a>
               </Menu.Item>
             </Menu>
           </Col>

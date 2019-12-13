@@ -12,8 +12,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@sendgrid/mail": "^6.4.0",
     "antd": "^3.25.2",
+    "axios": "^0.19.0",
     "blockstack": "^19.2.5",
+    "cors": "^2.8.5",
     "password-generator": "^2.2.3",
     "rc-queue-anim": "^1.8.3",
     "rc-scroll-anim": "^2.7.4",
