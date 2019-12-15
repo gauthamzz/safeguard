@@ -245,7 +245,7 @@ export default class Profile extends Component {
       };
 
       logins.unshift(login);
-      const options = { encrypt: false };
+      const options = { encrypt: true };
       userSession
         .putFile("loginss.json", JSON.stringify(logins), options)
         .then(() => {
@@ -264,7 +264,7 @@ export default class Profile extends Component {
       login => login.url != urlText && login.password != passwordText
     );
 
-    const options = { encrypt: false };
+    const options = { encrypt: true };
     userSession
       .putFile("loginss.json", JSON.stringify(logins), options)
       .then(() => {
@@ -303,7 +303,7 @@ export default class Profile extends Component {
     const { userSession } = this.props;
     this.setState({ isLoading: true });
     if (this.isLocal()) {
-      const options = { decrypt: false };
+      const options = { decrypt: true };
       userSession
         .getFile("loginss.json", options)
         .then(file => {
