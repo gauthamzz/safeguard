@@ -7,6 +7,19 @@ import Typed from "react-typed";
 const { Title, Text } = Typography;
 
 export default class Signin extends Component {
+  componentDidMount() {
+    this.openInNewTab();
+  }
+
+  openInNewTab = () => {
+    window.parent.postMessage(
+      {
+        open: "true"
+      },
+      "*"
+    );
+  };
+
   render() {
     const { handleSignIn } = this.props;
 
@@ -89,15 +102,15 @@ export default class Signin extends Component {
                 },
                 line_linked: {
                   enable: true,
-                  distance: 208.44356791251798,
+                  distance: 1000.44356791251798,
                   color: "#0099ff",
-                  opacity: 0.2,
+                  opacity: 0.1,
                   width: 1
                 },
                 move: {
                   enable: true,
                   speed: 0.2,
-                  direction: "any",
+                  direction: "left",
                   random: true,
                   straight: false,
                   out_mode: "out",
@@ -154,7 +167,7 @@ export default class Signin extends Component {
           <div
             key="2"
             style={{
-              marginTop: "11rem",
+              marginTop: "25vh",
               textAlign: "center"
             }}
           >
@@ -164,7 +177,7 @@ export default class Signin extends Component {
                   fontSize: "4rem"
                 }}
               >
-                Protect and remember <br /> your passwords for you
+                Protects and remembers <br /> passwords for you
               </Title>
               <Text
                 style={{
@@ -174,14 +187,16 @@ export default class Signin extends Component {
                 Safeguard is a <em />
                 <Typed
                   strings={[
-                    " Blockchain based password manager",
-                    " secure password manager",
-                    " way to forgot unsafe common passwords and be secure"
+                    " Blockchain based",
+                    " secure",
+                    " easy to use ",
+                    " Blockstack based "
                   ]}
                   typeSpeed={40}
                   backSpeed={50}
                   loop
                 />
+                password manager
                 <br />
               </Text>
 
@@ -308,20 +323,14 @@ export default class Signin extends Component {
           <div
             key="5"
             style={{
-              marginTop: 10,
-              padding: "8em",
-              textAlign: "center"
+              marginTop: "5rem",
+              paddingTop: "4rem",
+              paddingBottom: "4rem",
+              textAlign: "center",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='72' viewBox='0 0 36 72'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%230099ff' fill-opacity='0.07'%3E%3Cpath d='M2 6h12L8 18 2 6zm18 36h12l-6 12-6-12z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
             }}
           >
-            <Row
-              type="flex"
-              justify="space-around"
-              align="middle"
-              style={{
-                paddingTop: "3rem",
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='72' viewBox='0 0 36 72'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%230099ff' fill-opacity='0.07'%3E%3Cpath d='M2 6h12L8 18 2 6zm18 36h12l-6 12-6-12z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-              }}
-            >
+            <Row type="flex" justify="space-around" align="middle">
               <Col span={8} offset={2}>
                 <img
                   style={{
@@ -329,7 +338,7 @@ export default class Signin extends Component {
                     width: "70%",
                     verticalAlign: "middle"
                   }}
-                  src="https://res.cloudinary.com/matrimonal/image/upload/v1576148077/Screenshot_2019-12-05_at_11.35.56_PM_k34w5w.png"
+                  src="https://res.cloudinary.com/matrimonal/image/upload/v1576402822/Screenshot_2019-12-14_at_6.48.26_PM_mq0gmd.png"
                 />
               </Col>
               <Col span={8} offset={4}>
@@ -356,10 +365,59 @@ export default class Signin extends Component {
               </Col>
             </Row>
           </div>
+          <br />
+          <div
+            key="4"
+            style={{
+              marginTop: "5rem",
+              paddingTop: "4rem",
+              paddingBottom: "4rem",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230099ff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+            }}
+          >
+            <Row type="flex" justify="space-around" align="middle">
+              <Col span={8} offset={2}>
+                <Title
+                  style={{
+                    fontSize: "3.125rem"
+                  }}
+                >
+                  Decentralized and Secure
+                </Title>
+                <Text
+                  style={{
+                    fontSize: "1.25rem",
+                    marginBottom: "4rem",
+                    marginTop: "4rem"
+                  }}
+                >
+                  We run only on Client-Side(Your Device). Hence you store all
+                  your data and safeguard don't store any of your passwords
+                </Text>
+              </Col>
+              <Col
+                span={9}
+                offset={1}
+                style={{
+                  textAlign: "center"
+                }}
+              >
+                <img
+                  style={{
+                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                    width: "100%",
+                    verticalAlign: "middle"
+                  }}
+                  src="https://res.cloudinary.com/matrimonal/image/upload/v1576441724/Screenshot_2019-12-16_at_1.57.51_AM_dnbm4p.png"
+                />
+              </Col>
+            </Row>
+          </div>
           <div key="cards-section">
             <Row
               style={{
-                marginBottom: "10rem"
+                marginBottom: "10rem",
+                marginTop: "10rem"
               }}
             >
               <Col span={6} offset={3}>

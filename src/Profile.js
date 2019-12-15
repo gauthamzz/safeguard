@@ -28,8 +28,8 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import generatePassword from "password-generator";
 import zxcvbn from "zxcvbn";
 import copy from "copy-to-clipboard";
-import { stat } from "fs";
-import axios from "axios";
+import platform from "platform";
+import Onboarding from "./Onboarding";
 
 const { Meta } = Card;
 const { confirm } = Modal;
@@ -54,6 +54,11 @@ export default class Profile extends Component {
         }
       },
       username: "",
+      email: "",
+      phoneNumber: "",
+      emailNotifications: true,
+      phoneNotifications: true,
+      publicKey: "",
       newUrl: this.props.match.params.search,
       newPassword: "",
       newUsername: "",
@@ -65,17 +70,22 @@ export default class Profile extends Component {
       copied: false,
       noSearchResults: false,
       showPasswordGeneratorModal: false,
+      showSettingsModal: false,
       generatedPasswordRating: 2.0,
       passwordGenerated: "",
       generatedPasswordMemorable: true,
       generatedPasswordLength: 11,
       generatePasswordFeedback: "",
       sharePasswordModal: false,
-      sharePasswordBlockstackId: ""
+      sharePasswordBlockstackId: "",
+      showOnboarding: false,
+      emailAccountCreated: false
     };
   }
 
   componentDidMount() {
+    this.checkNewLogin();
+    this.fetchInfo();
     this.fetchData();
     this.getGeneratePassword(
       this.state.generatedPasswordLength,
@@ -87,7 +97,8 @@ export default class Profile extends Component {
     const { userSession } = this.props;
     this.setState({
       person: new Person(userSession.loadUserData().profile),
-      username: userSession.loadUserData().username
+      username: userSession.loadUserData().username,
+      email: userSession.loadUserData().email
     });
   }
 
@@ -115,6 +126,18 @@ export default class Profile extends Component {
     });
   }
 
+  handleNewEmail(event) {
+    this.setState({
+      email: event.target.value
+    });
+  }
+
+  handleNewPhonenumber(event) {
+    this.setState({
+      phoneNumber: event.target.value
+    });
+  }
+
   handleSharePasswordSubmit(url, username, password) {
     message.info(
       this.state.sharePasswordBlockstackId +
@@ -123,6 +146,17 @@ export default class Profile extends Component {
         username +
         password
     );
+  }
+
+  handleSettingsSubmit(event) {
+    this.saveSettings(
+      this.state.email,
+      this.state.emailNotifications,
+      this.state.phoneNumber,
+      this.state.phoneNotifications
+    );
+    message.success("Settings updated successfully");
+    this.toggleSettingsModal();
   }
 
   handleNewLoginSubmit(event) {
@@ -169,6 +203,34 @@ export default class Profile extends Component {
   //     });
   // }
 
+  handleOnboardingEmailSubmit(email, emailNotifications) {
+    console.log("saving", email, emailNotifications);
+    this.saveSettings(email, emailNotifications, undefined, undefined);
+  }
+
+  saveSettings(
+    email,
+    emailNotifications,
+    phoneNumber,
+    phoneNotifications,
+    emailAccountCreated
+  ) {
+    const { userSession } = this.props;
+    const settings = {
+      email: email,
+      phoneNumber: phoneNumber,
+      emailNotifications: emailNotifications,
+      phoneNotifications: phoneNotifications,
+      emailAccountCreated: emailAccountCreated
+    };
+    const options = { encrypt: false };
+    userSession
+      .putFile("infod.json", JSON.stringify(settings), options)
+      .then(() => {
+        console.log("settings updated");
+      });
+  }
+
   saveNewLogin(urlText, usernameText, passwordText) {
     const { userSession } = this.props;
     let logins = this.state.logins;
@@ -213,23 +275,30 @@ export default class Profile extends Component {
     message.success("Item has been deleted");
   }
 
-  // fetchPublicInfo() {
-  //   const { userSession } = this.props;
-  //   this.setState({ isLoading: true });
-  //   if (this.isLocal) {
-  //     const options = { decrypt: false };
-  //     userSession
-  //       .getFile("info.json", options)
-  //       .then(file => {
-  //         var info = JSON.parse(file || "[]");
-  //         console.log(info);
-  //       })
-  //       .finally(() => {
-  //         this.setState({ isLoading: false });
-  //       });
-  //   }
-  // }
+  fetchInfo() {
+    const { userSession } = this.props;
+    if (this.isLocal()) {
+      const options = { decrypt: false };
+      userSession.getFile("infod.json", options).then(file => {
+        if (!file) {
+          // if file doesn't exist then user is probably new
+          this.toggleOnboardingSection();
+        }
+        var info = JSON.parse(file || "[]");
+        this.setState({
+          email: info.email,
+          phoneNumber: info.phoneNumber,
+          emailNotifications: info.emailNotifications,
+          phoneNotifications: info.phoneNotifications,
+          emailAccountCreated: info.emailAccountCreated
+        });
+      });
 
+      if (this.state.emailAccountCreated) {
+        this.createNewAccountEmail();
+      }
+    }
+  }
   fetchData() {
     const { userSession } = this.props;
     this.setState({ isLoading: true });
@@ -307,6 +376,51 @@ export default class Profile extends Component {
   isLocal() {
     return this.props.match.params.username ? false : true;
   }
+
+  settingsElement = () => {
+    return (
+      <div>
+        Email
+        <Input
+          placeholder="tim@apple.com"
+          value={this.state.email}
+          onChange={e => this.handleNewEmail(e)}
+          style={{ marginBottom: 10 }}
+        />
+        <br />
+        Phone Number
+        <Input
+          placeholder="+91-999999999"
+          value={this.state.phoneNumber}
+          onChange={e => this.handleNewPhonenumber(e)}
+          style={{ marginBottom: 10 }}
+        />
+        <br />
+        <Checkbox
+          key="email-noti"
+          checked={this.state.emailNotifications}
+          onChange={() =>
+            this.setState({
+              emailNotifications: !this.state.emailNotifications
+            })
+          }
+        >
+          Send email alerts for new login activity.
+        </Checkbox>
+        {/* <Checkbox
+          key="phone-noti"
+          checked={this.state.phoneNotifications}
+          onChange={() =>
+            this.setState({
+              phoneNotifications: !this.state.phoneNotifications
+            })
+          }
+        >
+          Send SMS alerts.
+        </Checkbox> */}
+      </div>
+    );
+  };
 
   generatedPasswordElement = () => {
     return (
@@ -505,28 +619,94 @@ export default class Profile extends Component {
     });
   };
 
-  sendLoginEmail = () => {
-    console.log("test");
-    // axios.post(
-    //   `https://liver-impala-9566.twil.io/send`,
-    // JSON.stringify({
-    //   subject: "yo",
-    //   message: "hey"
-    // })
-    // )
+  toggleSettingsModal = () => {
+    this.fetchInfo();
+    this.setState({
+      showSettingsModal: !this.state.showSettingsModal
+    });
+  };
 
-    fetch(`https://liver-impala-9566.twil.io/send`, {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify({
-        subject: "yo",
-        message: "hey"
+  toggleOnboardingSection = () => {
+    this.setState({
+      showOnboarding: !this.state.showOnboarding
+    });
+
+    // TODO: if new account send email and make sure Onboarding section is not shown ever again.
+  };
+
+  createNewAccountEmail = () => {
+    const mail = {
+      templateId: "d-cbe214626b2949a7a5fa36f09d8c05c0",
+      from: "safeguard@safeguard.icu",
+      replyTo: "thabeatsz@gmail.com",
+      to: this.state.email
+    };
+    if (this.state.emailNotifications) this.sendEmail(mail);
+    this.setState({
+      emailAccountCreated: false
+    });
+
+    this.saveSettings(
+      this.state.email,
+      this.state.emailNotifications,
+      this.state.phoneNumber,
+      this.state.phoneNotifications,
+      false
+    );
+  };
+
+  checkNewLogin = () => {
+    const oldLogin = localStorage.getItem("EXISTING_LOGIN");
+    if (!oldLogin) {
+      console.log("sending email due to new device");
+      const mail = {
+        templateId: "d-c4e6407fed5246e4ad1205baa3f941a6",
+        dynamic_template_data: {
+          platform: platform.name,
+          os: String(platform.os),
+          id: this.state.username
+        },
+        from: "activity@safeguard.icu",
+        replyTo: "thabeatsz@gmail.com",
+        to: this.state.email
+      };
+      if (this.state.emailNotifications) this.sendEmail(mail);
+    }
+
+    localStorage.setItem("EXISTING_LOGIN", true);
+  };
+
+  sendEmail = mail => {
+    const body = JSON.stringify(mail);
+    fetch(
+      "https://cors-anywhere.herokuapp.com/https://liver-impala-9566.twil.io/send",
+      {
+        method: "POST",
+        body: body,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "*/*"
+        }
+      }
+    )
+      .then(function(response) {
+        console.log(
+          response.status,
+          response.statusText,
+          response.headers,
+          response.url
+        );
+
+        return response.text();
       })
-    }).then(e => console.log(e));
+      .catch(function(error) {
+        console.log(error.message);
+      });
   };
 
   HeaderElement = () => {
     const isIframe = window.innerWidth < 576 ? true : false;
+    const isOnboarding = this.state.showOnboarding;
     if (isIframe) {
       return (
         <PageHeader
@@ -541,6 +721,15 @@ export default class Profile extends Component {
               Add new password
             </Button>
           ]}
+        />
+      );
+    }
+
+    if (isOnboarding) {
+      return (
+        <PageHeader
+          title="🛡Safeguard"
+          subTitle="Blockchain based password manager"
         />
       );
     }
@@ -580,225 +769,176 @@ export default class Profile extends Component {
     return !userSession.isSignInPending() && person ? (
       <div>
         {this.HeaderElement()}
-        <Row>
-          <Col md={4} sm={0} xs={0}>
-            <Menu
-              defaultOpenKeys={["sub1"]}
-              defaultSelectedKeys={["web"]}
-              mode="inline"
-            >
-              <Menu.Item key="web">
-                <Icon type="global" />
-                <span>Websites</span>
-              </Menu.Item>
-              <SubMenu
-                key="sub1"
-                title={
-                  <span>
-                    <Icon type="user" />
-                    <span>
-                      {person.name() ? person.name() : "Nameless Person"}
-                    </span>
-                  </span>
-                }
+        {this.state.showOnboarding === true ? (
+          <Onboarding
+            person={person}
+            toggleOnboardingSection={this.toggleOnboardingSection}
+            email={this.state.email}
+            handleNewEmail={this.handleNewEmail}
+            handleOnboardingEmailSubmit={this.handleOnboardingEmailSubmit}
+            saveSettings={this.saveSettings}
+            userSession={this.props.userSession}
+          />
+        ) : (
+          <Row>
+            <Col md={4} sm={0} xs={0}>
+              <Menu
+                defaultOpenKeys={["sub1"]}
+                defaultSelectedKeys={["web"]}
+                mode="inline"
               >
-                <Menu.ItemGroup key="g1" title="Blockstack">
-                  <Menu.Item key="id">
-                    <Avatar
-                      src={
-                        person.avatarUrl()
-                          ? person.avatarUrl()
-                          : avatarFallbackImage
-                      }
-                      shape="square"
-                      size="small"
-                      style={{ backgroundColor: "#87d068", margin: 10 }}
-                    />
-                    {username}
-                  </Menu.Item>
-                </Menu.ItemGroup>
-              </SubMenu>
-              <Menu.Item key="generate-password">
-                {this.isLocal() && (
-                  <a onClick={this.togglePasswordGeneratorModal}>
-                    <Icon type="key" />
-                    Generate Password
-                  </a>
-                )}
-              </Menu.Item>
-              <Menu.Item key="2">
-                {this.isLocal() && (
-                  <a onClick={handleSignOut.bind(this)}>
-                    <Icon type="logout" />
-                    Logout
-                  </a>
-                )}
-              </Menu.Item>
-              <Menu.Item key="2">
-                <a onClick={this.sendLoginEmail}>
-                  <Icon type="mail" />
-                  send email
-                </a>
-              </Menu.Item>
-            </Menu>
-          </Col>
-          <Col md={20} sm={24} xs={24}>
-            <div className="container">
-              <div className="row">
-                <div className="col-md-offset-3 col-md-6">
+                <Menu.Item key="web">
+                  <Icon type="global" />
+                  <span>Websites</span>
+                </Menu.Item>
+                <SubMenu
+                  key="sub1"
+                  title={
+                    <span>
+                      <Icon type="user" />
+                      <span>
+                        {person.name() ? person.name() : "Nameless Person"}
+                      </span>
+                    </span>
+                  }
+                >
+                  <Menu.ItemGroup key="g1" title="Blockstack">
+                    <Menu.Item key="id">
+                      <Avatar
+                        src={
+                          person.avatarUrl()
+                            ? person.avatarUrl()
+                            : avatarFallbackImage
+                        }
+                        shape="square"
+                        size="small"
+                        style={{ backgroundColor: "#87d068", margin: 10 }}
+                      />
+                      {username}
+                    </Menu.Item>
+                  </Menu.ItemGroup>
+                </SubMenu>
+                <Menu.Item key="generate-password">
                   {this.isLocal() && (
-                    <Modal
-                      title="Add Login"
-                      visible={visible}
-                      onCancel={this.handleCancel}
-                      onOk={e => this.handleNewLoginSubmit(e)}
-                      style={{ top: 20 }}
-                    >
-                      url
-                      <Input
-                        addonBefore="https://"
-                        placeholder="google.com"
-                        value={this.state.newUrl}
-                        onChange={e => this.handleNewUrlChange(e)}
-                        style={{ marginBottom: 10 }}
-                        suffix={
-                          <Icon
-                            type="link"
-                            style={{ color: "rgba(0,0,0,.25)" }}
-                          />
-                        }
-                      />
-                      username or email
-                      <Input
-                        placeholder="Enter your username"
-                        style={{ marginBottom: 10 }}
-                        value={this.state.newUsername}
-                        onChange={e => this.handleNewUsernameChange(e)}
-                        suffix={
-                          <Icon
-                            type="user"
-                            style={{ color: "rgba(0,0,0,.25)" }}
-                          />
-                        }
-                      />
-                      <Text>Password</Text>
-                      <Input.Password
-                        placeholder="input password"
-                        value={this.state.newPassword}
-                        onChange={e => this.handleNewPasswordChange(e)}
-                        style={{ marginBottom: 10 }}
-                      />
-                      <Collapse bordered={false}>
-                        <Panel header="Generate Password" key="gen">
-                          {this.generatedPasswordElement()}
-                        </Panel>
-                      </Collapse>
-                    </Modal>
+                    <a onClick={this.togglePasswordGeneratorModal}>
+                      <Icon type="key" />
+                      Generate Password
+                    </a>
                   )}
+                </Menu.Item>
+                <Menu.Item key="settings">
+                  {this.isLocal() && (
+                    <a onClick={this.toggleSettingsModal}>
+                      <Icon type="setting" />
+                      Settings
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item key="feedback">
+                 
+                    <a href="https://forms.gle/ZnCAQH63hjJxw7ci9" target="_blank">
+                      <Icon type="form" />
+                      Feedback
+                    </a>
+                  
+                </Menu.Item>
 
+                
+
+                <Menu.Item key="2">
                   {this.isLocal() && (
-                    <Modal
-                      title="Generate Secure Passwords"
-                      visible={this.state.showPasswordGeneratorModal}
-                      onCancel={this.togglePasswordGeneratorModal}
-                      onOk={() => {
-                        copy(this.state.passwordGenerated);
-                        message.success("Generated password copied");
-                        this.togglePasswordGeneratorModal();
-                      }}
-                    >
-                      {this.generatedPasswordElement()}
-                    </Modal>
+                    <a onClick={handleSignOut.bind(this)}>
+                      <Icon type="logout" />
+                      Logout
+                    </a>
                   )}
-                  <div className="col-md-12 logins">
-                    {this.state.isLoading && (
-                      <Row gutter={[24, 24]}>
-                        <Col lg={8} md={12} xs={24}>
-                          <Card
-                            style={{
-                              marginLeft: 20,
-                              marginRight: 20,
-                              boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
-                              borderRadius: 5,
-                              borderColor: "white"
-                            }}
-                          >
-                            <Skeleton active avatar></Skeleton>
-                          </Card>
-                        </Col>
-                        <Col lg={8} md={12} xs={24}>
-                          <Card
-                            style={{
-                              marginLeft: 20,
-                              marginRight: 20,
-                              boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
-                              borderRadius: 5,
-                              borderColor: "white"
-                            }}
-                          >
-                            <Skeleton active avatar></Skeleton>
-                          </Card>
-                        </Col>
-                        <Col lg={8} md={12} xs={24}>
-                          <Card
-                            style={{
-                              marginLeft: 20,
-                              marginRight: 20,
-                              boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
-                              borderRadius: 5,
-                              borderColor: "white"
-                            }}
-                          >
-                            <Skeleton active avatar></Skeleton>
-                          </Card>
-                        </Col>
-                        <Col lg={8} md={12} xs={24}>
-                          <Card
-                            style={{
-                              marginLeft: 20,
-                              marginRight: 20,
-                              boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
-                              borderRadius: 5,
-                              borderColor: "white"
-                            }}
-                          >
-                            <Skeleton active avatar></Skeleton>
-                          </Card>
-                        </Col>
-                      </Row>
+                </Menu.Item>
+              </Menu>
+            </Col>
+            <Col md={20} sm={24} xs={24}>
+              <div className="container">
+                <div className="row">
+                  <div className="col-md-offset-3 col-md-6">
+                    {this.isLocal() && (
+                      <Modal
+                        title="Add Login"
+                        visible={visible}
+                        onCancel={this.handleCancel}
+                        onOk={e => this.handleNewLoginSubmit(e)}
+                        style={{ top: 20 }}
+                      >
+                        url
+                        <Input
+                          addonBefore="https://"
+                          placeholder="google.com"
+                          value={this.state.newUrl}
+                          onChange={e => this.handleNewUrlChange(e)}
+                          style={{ marginBottom: 10 }}
+                          suffix={
+                            <Icon
+                              type="link"
+                              style={{ color: "rgba(0,0,0,.25)" }}
+                            />
+                          }
+                        />
+                        username or email
+                        <Input
+                          placeholder="Enter your username"
+                          style={{ marginBottom: 10 }}
+                          value={this.state.newUsername}
+                          onChange={e => this.handleNewUsernameChange(e)}
+                          suffix={
+                            <Icon
+                              type="user"
+                              style={{ color: "rgba(0,0,0,.25)" }}
+                            />
+                          }
+                        />
+                        <Text>Password</Text>
+                        <Input.Password
+                          placeholder="input password"
+                          value={this.state.newPassword}
+                          onChange={e => this.handleNewPasswordChange(e)}
+                          style={{ marginBottom: 10 }}
+                        />
+                        <Collapse bordered={false}>
+                          <Panel header="Generate Password" key="gen">
+                            {this.generatedPasswordElement()}
+                          </Panel>
+                        </Collapse>
+                      </Modal>
                     )}
-                    <Row gutter={[24, 24]}>
-                      {this.state.noSearchResults && (
-                        <Col lg={8} md={12} xs={24}>
-                          {" "}
-                          <div
-                            style={{
-                              marginLeft: 20,
-                              marginRight: 20
-                            }}
-                          >
-                            <Empty
-                              image="https://gw.alipayobjects.com/mdn/miniapp_social/afts/img/A*pevERLJC9v0AAAAAAAAAAABjAQAAAQ/original"
-                              imageStyle={{
-                                height: 60
-                              }}
-                              description={
-                                <span>Sorry, No Password for this site.</span>
-                              }
-                            >
-                              <Button
-                                type="primary"
-                                onClick={event => (window.location.href = "/")}
-                              >
-                                {" "}
-                                See all passwords
-                              </Button>
-                            </Empty>
-                          </div>{" "}
-                        </Col>
-                      )}
-                      {cardItems.map(status => (
-                        <div className="status" key={status.id}>
+
+                    {this.isLocal() && (
+                      <Modal
+                        title="Generate Secure Passwords"
+                        visible={this.state.showPasswordGeneratorModal}
+                        onCancel={this.togglePasswordGeneratorModal}
+                        onOk={() => {
+                          copy(this.state.passwordGenerated);
+                          message.success("Generated password copied");
+                          this.togglePasswordGeneratorModal();
+                        }}
+                      >
+                        {this.generatedPasswordElement()}
+                      </Modal>
+                    )}
+                    {this.isLocal() && (
+                      <Modal
+                        title="Settings"
+                        visible={this.state.showSettingsModal}
+                        onCancel={() => this.toggleSettingsModal()}
+                        onOk={() => {
+                          console.log("apply changes to setting");
+                          this.handleSettingsSubmit();
+                        }}
+                      >
+                        {this.settingsElement()}
+                      </Modal>
+                    )}
+                    <div className="col-md-12 logins">
+                      {this.state.isLoading && (
+                        <Row gutter={[24, 24]}>
                           <Col lg={8} md={12} xs={24}>
                             <Card
                               style={{
@@ -808,44 +948,135 @@ export default class Profile extends Component {
                                 borderRadius: 5,
                                 borderColor: "white"
                               }}
-                              actions={this.cardElement(status)}
                             >
-                              <Meta
-                                avatar={
-                                  <Avatar
-                                    src={`//logo.clearbit.com/${status.url}`}
-                                  />
-                                }
-                                title={<div>{status.url}</div>}
-                                description={
-                                  <div>
-                                    <Text copyable={{ text: status.username }}>
-                                      {status.username}
-                                    </Text>
-                                    <br />
-                                    <Text
-                                      type="secondary"
-                                      copyable={{ text: status.password }}
-                                      style={{
-                                        WebkitTextSecurity: "disc"
-                                      }}
-                                    >
-                                      {status.password}
-                                    </Text>
-                                  </div>
-                                }
-                              />
+                              <Skeleton active avatar></Skeleton>
                             </Card>
                           </Col>
-                        </div>
-                      ))}
-                    </Row>
+                          <Col lg={8} md={12} xs={24}>
+                            <Card
+                              style={{
+                                marginLeft: 20,
+                                marginRight: 20,
+                                boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                                borderRadius: 5,
+                                borderColor: "white"
+                              }}
+                            >
+                              <Skeleton active avatar></Skeleton>
+                            </Card>
+                          </Col>
+                          <Col lg={8} md={12} xs={24}>
+                            <Card
+                              style={{
+                                marginLeft: 20,
+                                marginRight: 20,
+                                boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                                borderRadius: 5,
+                                borderColor: "white"
+                              }}
+                            >
+                              <Skeleton active avatar></Skeleton>
+                            </Card>
+                          </Col>
+                          <Col lg={8} md={12} xs={24}>
+                            <Card
+                              style={{
+                                marginLeft: 20,
+                                marginRight: 20,
+                                boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                                borderRadius: 5,
+                                borderColor: "white"
+                              }}
+                            >
+                              <Skeleton active avatar></Skeleton>
+                            </Card>
+                          </Col>
+                        </Row>
+                      )}
+                      <Row gutter={[24, 24]}>
+                        {this.state.noSearchResults && (
+                          <Col lg={8} md={12} xs={24}>
+                            {" "}
+                            <div
+                              style={{
+                                marginLeft: 20,
+                                marginRight: 20
+                              }}
+                            >
+                              <Empty
+                                image="https://gw.alipayobjects.com/mdn/miniapp_social/afts/img/A*pevERLJC9v0AAAAAAAAAAABjAQAAAQ/original"
+                                imageStyle={{
+                                  height: 60
+                                }}
+                                description={
+                                  <span>Sorry, No Password for this site.</span>
+                                }
+                              >
+                                <Button
+                                  type="primary"
+                                  onClick={event =>
+                                    (window.location.href = "/")
+                                  }
+                                >
+                                  {" "}
+                                  See all passwords
+                                </Button>
+                              </Empty>
+                            </div>{" "}
+                          </Col>
+                        )}
+                        {cardItems.map(status => (
+                          <div className="status" key={status.id}>
+                            <Col lg={8} md={12} xs={24}>
+                              <Card
+                                style={{
+                                  marginLeft: 20,
+                                  marginRight: 20,
+                                  boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                                  borderRadius: 5,
+                                  borderColor: "white"
+                                }}
+                                actions={this.cardElement(status)}
+                              >
+                                <Meta
+                                  avatar={
+                                    <Avatar
+                                      src={`//logo.clearbit.com/${status.url}`}
+                                    />
+                                  }
+                                  title={<div>{status.url}</div>}
+                                  description={
+                                    <div>
+                                      <Text
+                                        copyable={{ text: status.username }}
+                                      >
+                                        {status.username}
+                                      </Text>
+                                      <br />
+                                      <Text
+                                        type="secondary"
+                                        copyable={{ text: status.password }}
+                                        style={{
+                                          WebkitTextSecurity: "disc"
+                                        }}
+                                      >
+                                        {status.password}
+                                      </Text>
+                                    </div>
+                                  }
+                                />
+                              </Card>
+                            </Col>
+                          </div>
+                        ))}
+                      </Row>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Col>
-        </Row>
+            </Col>
+          </Row>
+        )}
       </div>
     ) : null;
   }
