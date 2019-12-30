@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Profile from "./Profile.js";
 import Signin from "./Signin.js";
-import { UserSession, AppConfig } from "blockstack";
+import { UserSession, AppConfig, getPublicKeyFromPrivate } from "blockstack";
 import { Switch, Route } from "react-router-dom";
 
 const appConfig = new AppConfig(["store_write", "publish_data"]);
@@ -38,6 +38,7 @@ export default class App extends Component {
                 render={routeProps => (
                   <Profile
                     userSession={userSession}
+                    getPublicKeyFromPrivate={getPublicKeyFromPrivate}
                     handleSignOut={this.handleSignOut}
                     {...routeProps}
                   />

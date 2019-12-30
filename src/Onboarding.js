@@ -24,10 +24,16 @@ export default class Onboarding extends Component {
 
   saveSettings(email, emailNotifications) {
     const { userSession } = this.props;
+
+    const { getPublicKeyFromPrivate } = this.props;
+    let userData = userSession.loadUserData();
+
+    const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
     const settings = {
       email: email,
-	  emailNotifications: emailNotifications,
-	  emailAccountCreated: true,
+      emailNotifications: emailNotifications,
+      emailAccountCreated: true,
+      publicKey: publicKey
     };
     const options = { encrypt: false };
     userSession
@@ -37,13 +43,12 @@ export default class Onboarding extends Component {
       });
   }
   componentDidUpdate() {
-	  // TODO: better approach
-	  if(this.state.newEmail === null && this.props.email !== null)
-	  this.setState({
-		  newEmail: this.props.email
-	  })
+    // TODO: better approach
+    if (this.state.newEmail === null && this.props.email !== null)
+      this.setState({
+        newEmail: this.props.email
+      });
   }
-
 
   setCurrentSection = value => {
     this.setState({
@@ -62,6 +67,7 @@ export default class Onboarding extends Component {
   };
 
   getFirstSection = () => {
+    const name = this.props.person.name() ? this.props.person.name() !== null : "nice to meet you!"
     return (
       <div
         style={{
@@ -70,7 +76,7 @@ export default class Onboarding extends Component {
       >
         <Typed
           strings={[
-            `<h1>👋 Hey, ${this.props.person.name()}</h1> <h2>Welcome to Safeguard.</h2>`
+            `<h1>👋 Hey, ${name}</h1> <h2>Welcome to Safeguard.</h2>`
           ]}
           typeSpeed={30}
           showCursor={false}
@@ -217,6 +223,11 @@ export default class Onboarding extends Component {
             width: "20vh",
             fontSize: "2vh"
           }}
+          onClick={() => {
+            window.open(
+              "https://chrome.google.com/webstore/detail/safeguard/mnlehllbgbabkdkomopjpaeaogbmdodj"
+            );
+          }}
         >
           <Icon type="chrome" /> Install now
         </Button>
@@ -242,7 +253,7 @@ export default class Onboarding extends Component {
     );
   };
   render() {
-	const { currentSection } = this.state;
+    const { currentSection } = this.state;
     return (
       <Row
         type="flex"
@@ -272,7 +283,6 @@ export default class Onboarding extends Component {
               description="Install the Browser Extension to access your passwords from anywhere."
             />
           </Steps>
-
         </Col>
       </Row>
     );

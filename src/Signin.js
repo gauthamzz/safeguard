@@ -217,7 +217,11 @@ export default class Signin extends Component {
                 Get Started
               </Button>
               <Button
-                onClick={handleSignIn.bind(this)}
+                onClick={() => {
+                  window.open(
+                    "https://chrome.google.com/webstore/detail/safeguard/mnlehllbgbabkdkomopjpaeaogbmdodj"
+                  );
+                }}
                 key="sign-in"
                 size="large"
                 style={{

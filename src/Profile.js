@@ -30,6 +30,7 @@ import zxcvbn from "zxcvbn";
 import copy from "copy-to-clipboard";
 import platform from "platform";
 import Onboarding from "./Onboarding";
+import { setTwoToneColor } from "antd/lib/icon/twoTonePrimaryColor";
 
 const { Meta } = Card;
 const { confirm } = Modal;
@@ -138,7 +139,30 @@ export default class Profile extends Component {
     });
   }
 
+  getPublicKey(username) {
+    const { userSession } = this.props;
+    const options = {
+      decrypt: false,
+      username,
+      zoneFileLookupURL: "https://core.blockstack.org/v1/names"
+    };
+    try {
+      return userSession.getFile("infod.json", options).then(file => {
+        console.log(username, file);
+        return file.publicKey;
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    console.error("unable to find public key");
+  }
+
   handleSharePasswordSubmit(url, username, password) {
+    // const {getPublicKeyFromPrivate} = this.props;
+    // let userData = this.props.userSession.loadUserData();
+
+    // console.log(getPublicKeyFromPrivate(userData.appPrivateKey));
+    const publicKey = this.getPublicKey("gauthamzzz.id.blockstack");
     message.info(
       this.state.sharePasswordBlockstackId +
         "is going to get the password for" +
@@ -215,14 +239,19 @@ export default class Profile extends Component {
     phoneNotifications,
     emailAccountCreated
   ) {
-    const { userSession } = this.props;
+    const { userSession, getPublicKeyFromPrivate } = this.props;
+    let userData = userSession.loadUserData();
+
+    const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
     const settings = {
       email: email,
       phoneNumber: phoneNumber,
       emailNotifications: emailNotifications,
       phoneNotifications: phoneNotifications,
-      emailAccountCreated: emailAccountCreated
+      emailAccountCreated: emailAccountCreated,
+      publicKey: publicKey
     };
+    console.log(settings);
     const options = { encrypt: false };
     userSession
       .putFile("infod.json", JSON.stringify(settings), options)
@@ -290,7 +319,8 @@ export default class Profile extends Component {
           phoneNumber: info.phoneNumber,
           emailNotifications: info.emailNotifications,
           phoneNotifications: info.phoneNotifications,
-          emailAccountCreated: info.emailAccountCreated
+          emailAccountCreated: info.emailAccountCreated,
+          publicKey: info.publicKey
         });
       });
 
@@ -515,6 +545,44 @@ export default class Profile extends Component {
     );
   };
 
+  // TODO: share password if ever needed currently scraped
+
+  //   {this.state.sharePasswordModal && (
+  //     <Modal
+  //       title="Share password"
+  //       visible={this.state.sharePasswordModal}
+  //       onOk={e =>
+  //         this.handleSharePasswordSubmit(
+  //           status.url,
+  //           status.username,
+  //           status.password
+  //         )
+  //       }
+  //       onCancel={() => {
+  //         this.setState({
+  //           sharePasswordModal: !this.state.sharePasswordModal
+  //         });
+  //       }}
+  //     >
+  //       <Input
+  //         placeholder="Blockstack id"
+  //         value={this.state.sharePasswordBlockstackId}
+  //         onChange={e => this.handleNewShareBlockstackId(e)}
+  //       />
+  //     </Modal>
+  //   )}
+  //   <Icon
+  //   xs={0}
+  //   lg={1}
+  //   type="share-alt"
+  //   key="share-alt"
+  //   onClick={() =>
+  //     this.setState({
+  //       sharePasswordModal: !this.state.sharePasswordModal
+  //     })
+  //   }
+  // />,
+
   cardElement = status => {
     // 576 is xs in ant design
     const isIframe = window.innerWidth < 576 ? true : false;
@@ -529,7 +597,6 @@ export default class Profile extends Component {
             }
           />
         </Tooltip>,
-
         <Icon
           xs={0}
           lg={1}
@@ -539,6 +606,7 @@ export default class Profile extends Component {
         />
       ];
     }
+
     return [
       <Tooltip title="Click to copy password">
         <CopyToClipboard
@@ -553,43 +621,9 @@ export default class Profile extends Component {
       </Tooltip>,
       <a href={`https://${status.url}`} target="_blank">
         {" "}
-        <Icon type="link" key="link" />{" "}
-        {this.state.sharePasswordModal && (
-          <Modal
-            title="Share password"
-            visible={this.state.sharePasswordModal}
-            onOk={e =>
-              this.handleSharePasswordSubmit(
-                status.url,
-                status.username,
-                status.password
-              )
-            }
-            onCancel={() => {
-              this.setState({
-                sharePasswordModal: !this.state.sharePasswordModal
-              });
-            }}
-          >
-            <Input
-              placeholder="Blockstack id"
-              value={this.state.sharePasswordBlockstackId}
-              onChange={e => this.handleNewShareBlockstackId(e)}
-            />
-          </Modal>
-        )}
+        <Icon type="link" key="link" />
       </a>,
-      <Icon
-        xs={0}
-        lg={1}
-        type="share-alt"
-        key="share-alt"
-        onClick={() =>
-          this.setState({
-            sharePasswordModal: !this.state.sharePasswordModal
-          })
-        }
-      />,
+
       <Icon
         xs={0}
         lg={1}
@@ -755,7 +789,7 @@ export default class Profile extends Component {
   };
 
   render() {
-    const { handleSignOut, userSession } = this.props;
+    const { handleSignOut, userSession, getPublicKeyFromPrivate } = this.props;
     const { person, visible } = this.state;
     const { username } = this.state;
     const { logins, searchLogins } = this.state;
@@ -772,6 +806,7 @@ export default class Profile extends Component {
         {this.state.showOnboarding === true ? (
           <Onboarding
             person={person}
+            getPublicKeyFromPrivate={getPublicKeyFromPrivate}
             toggleOnboardingSection={this.toggleOnboardingSection}
             email={this.state.email}
             handleNewEmail={this.handleNewEmail}
@@ -803,7 +838,12 @@ export default class Profile extends Component {
                   }
                 >
                   <Menu.ItemGroup key="g1" title="Blockstack">
-                    <Menu.Item key="id">
+                    <Menu.Item
+                      key="id"
+                      onClick={() => {
+                        window.open("https://browser.blockstack.org/profiles");
+                      }}
+                    >
                       <Avatar
                         src={
                           person.avatarUrl()
@@ -835,15 +875,11 @@ export default class Profile extends Component {
                   )}
                 </Menu.Item>
                 <Menu.Item key="feedback">
-                 
-                    <a href="https://forms.gle/ZnCAQH63hjJxw7ci9" target="_blank">
-                      <Icon type="form" />
-                      Feedback
-                    </a>
-                  
+                  <a href="https://forms.gle/ZnCAQH63hjJxw7ci9" target="_blank">
+                    <Icon type="form" />
+                    Feedback
+                  </a>
                 </Menu.Item>
-
-                
 
                 <Menu.Item key="2">
                   {this.isLocal() && (
