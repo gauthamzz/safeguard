@@ -56,7 +56,7 @@ export default class Signin extends Component {
             params={{
               particles: {
                 number: {
-                  value: 20,
+                  value: 7,
                   density: {
                     enable: true,
                     value_area: 1300.9002517356944
@@ -172,69 +172,139 @@ export default class Signin extends Component {
             }}
           >
             <div>
-              <Title
-                style={{
-                  fontSize: "4rem"
-                }}
-              >
-                Protects and remembers <br /> passwords for you
-              </Title>
-              <Text
-                style={{
-                  fontSize: "1.5rem"
-                }}
-              >
-                Safeguard is a <em />
-                <Typed
-                  strings={[
-                    " Blockchain based",
-                    " secure",
-                    " easy to use ",
-                    " Blockstack based "
-                  ]}
-                  typeSpeed={40}
-                  backSpeed={50}
-                  loop
-                />
-                password manager
-                <br />
-              </Text>
-
-              <Button
-                onClick={handleSignIn.bind(this)}
-                key="sign-in"
-                type="primary"
-                size="large"
-                style={{
-                  marginTop: "3em",
-                  marginRight: "1em",
-                  boxShadow: "0 5px 18px 0 rgba(0,0,0,.1)",
-                  borderRadius: "3px",
-                  border: "none",
-                  height: "3rem"
-                }}
-              >
-                Get Started
-              </Button>
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://chrome.google.com/webstore/detail/safeguard/mnlehllbgbabkdkomopjpaeaogbmdodj"
-                  );
-                }}
-                key="sign-in"
-                size="large"
-                style={{
-                  marginTop: "3em",
-                  marginRight: "1em",
-                  boxShadow: "0 5px 18px 0 rgba(0,0,0,.1)",
-                  borderRadius: "3px",
-                  border: "none",
-                  height: "3rem"
-                }}
-              >
-                Download Chrome extension
-              </Button>
+              <Row type="flex" justify="space-around" align="middle">
+                <Col lg={24} md={0}>
+                  <Title
+                    style={{
+                      fontSize: "4rem"
+                    }}
+                  >
+                    Protects and remembers <br /> passwords for you
+                  </Title>
+                  <Text
+                    style={{
+                      fontSize: "1.5rem"
+                    }}
+                  >
+                    Safeguard is a <em />
+                    <Typed
+                      strings={[
+                        " Blockchain based",
+                        " secure",
+                        " easy to use ",
+                        " Blockstack based "
+                      ]}
+                      typeSpeed={40}
+                      backSpeed={50}
+                      loop
+                    />
+                    password manager
+                    <br />
+                  </Text>
+                </Col>
+              </Row>
+              <Row type="flex" justify="space-around" align="middle">
+                <Col lg={0} md={24}>
+                  <Title
+                    style={{
+                      fontSize: "6rem"
+                    }}
+                  >
+                    Protects and remembers <br /> passwords for you
+                  </Title>
+                  <Text
+                    style={{
+                      fontSize: "3rem"
+                    }}
+                  >
+                    Safeguard is a Blockchain based <br /> password manager
+                    <br />
+                  </Text>
+                </Col>
+              </Row>
+              <Row type="flex" justify="space-around" align="middle">
+                <Col lg={24} md={0}>
+                  <Button
+                    onClick={handleSignIn.bind(this)}
+                    key="sign-in"
+                    type="primary"
+                    size="large"
+                    style={{
+                      marginTop: "3em",
+                      marginRight: "1em",
+                      boxShadow: "0 5px 18px 0 rgba(0,0,0,.1)",
+                      borderRadius: "3px",
+                      border: "none",
+                      height: "3rem"
+                    }}
+                  >
+                    Get Started
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      window.open(
+                        "https://chrome.google.com/webstore/detail/safeguard/mnlehllbgbabkdkomopjpaeaogbmdodj"
+                      );
+                    }}
+                    key="sign-in"
+                    size="large"
+                    style={{
+                      marginTop: "3em",
+                      marginRight: "1em",
+                      boxShadow: "0 5px 18px 0 rgba(0,0,0,.1)",
+                      borderRadius: "3px",
+                      border: "none",
+                      height: "3rem"
+                    }}
+                  >
+                    Download Chrome extension
+                  </Button>
+                </Col>
+              </Row>
+              <Row type="flex" justify="space-around" align="middle">
+                <Col lg={0} md={24}>
+                  <Button
+                    onClick={handleSignIn.bind(this)}
+                    key="sign-in"
+                    type="primary"
+                    size="large"
+                    style={{
+                      marginTop: "3em",
+                      marginRight: "1em",
+                      boxShadow: "0 5px 18px 0 rgba(0,0,0,.1)",
+                      borderRadius: "3px",
+                      border: "none",
+                      height: "7rem",
+                      fontSize: "2.5rem"
+                    }}
+                  >
+                    Get Started
+                  </Button>
+                </Col>
+                <Col lg={0} md={24}>
+                  <Button
+                    onClick={() => {
+                      window.open(
+                        "https://chrome.google.com/webstore/detail/safeguard/mnlehllbgbabkdkomopjpaeaogbmdodj"
+                      );
+                    }}
+                    key="sign-in"
+                    size="large"
+                    style={{
+                      marginTop: "1em",
+                      marginRight: "1em",
+                      boxShadow: "0 5px 18px 0 rgba(0,0,0,.1)",
+                      borderRadius: "3px",
+                      border: "none",
+                      height: "7rem",
+                      fontSize: "2.5rem",
+                      marginBottom: "20rem"
+                    }}
+                  >
+                    Download Chrome extension
+                  </Button>
+                </Col>
+              </Row>
             </div>
           </div>
           <div key="3">
@@ -286,17 +356,61 @@ export default class Signin extends Component {
             }}
           >
             <Row type="flex" justify="space-around" align="middle">
-              <Col span={8} offset={2}>
+              <Col lg={24} md={0}>
+                <Row type="flex" justify="space-around" align="middle">
+                  <Col span={8} offset={2}>
+                    <Title
+                      style={{
+                        fontSize: "3.125rem"
+                      }}
+                    >
+                      Store and autofill your passwords
+                    </Title>
+                    <Text
+                      style={{
+                        fontSize: "1.25rem",
+                        marginBottom: "4rem",
+                        marginTop: "4rem"
+                      }}
+                    >
+                      Save all your passwords at one place and autofill them
+                      with ease using browser extension.
+                    </Text>
+                    <img src="https://res.cloudinary.com/matrimonal/image/upload/v1576177295/DogJumpDoodle_aq6eay.svg" />
+                  </Col>
+                  <Col
+                    span={8}
+                    offset={4}
+                    style={{
+                      textAlign: "center"
+                    }}
+                  >
+                    <img
+                      style={{
+                        boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                        width: "70%",
+                        verticalAlign: "middle"
+                      }}
+                      src="https://res.cloudinary.com/matrimonal/image/upload/v1576145363/Screenshot_2019-12-12_at_3.22.30_PM_qyondc.png"
+                    />
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+            <Row type="flex" justify="space-around" align="middle">
+              <Col lg={0} md={16} offset={1}>
                 <Title
                   style={{
-                    fontSize: "3.125rem"
+                    fontSize: "4rem",
+                    textAlign: "center"
                   }}
                 >
                   Store and autofill your passwords
                 </Title>
                 <Text
                   style={{
-                    fontSize: "1.25rem",
+                    textAlign: "center",
+                    fontSize: "2.5rem",
                     marginBottom: "4rem",
                     marginTop: "4rem"
                   }}
@@ -304,20 +418,10 @@ export default class Signin extends Component {
                   Save all your passwords at one place and autofill them with
                   ease using browser extension.
                 </Text>
-                <img src="https://res.cloudinary.com/matrimonal/image/upload/v1576177295/DogJumpDoodle_aq6eay.svg" />
-              </Col>
-              <Col
-                span={8}
-                offset={4}
-                style={{
-                  textAlign: "center"
-                }}
-              >
                 <img
                   style={{
-                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
-                    width: "70%",
-                    verticalAlign: "middle"
+                    width: "100%",
+                    padding: "5rem"
                   }}
                   src="https://res.cloudinary.com/matrimonal/image/upload/v1576145363/Screenshot_2019-12-12_at_3.22.30_PM_qyondc.png"
                 />
@@ -334,6 +438,8 @@ export default class Signin extends Component {
               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='72' viewBox='0 0 36 72'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%230099ff' fill-opacity='0.07'%3E%3Cpath d='M2 6h12L8 18 2 6zm18 36h12l-6 12-6-12z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
             }}
           >
+          <Row type="flex" justify="space-around" align="middle">
+              <Col lg={24} md={0} >
             <Row type="flex" justify="space-around" align="middle">
               <Col span={8} offset={2}>
                 <img
@@ -368,6 +474,38 @@ export default class Signin extends Component {
                 />
               </Col>
             </Row>
+            </Col>
+            </Row>
+            <Row type="flex" justify="space-around" align="middle">
+              <Col lg={0} md={16} offset={1}>
+           
+                <Title
+                  style={{
+                    fontSize: "4rem",
+                  }}
+                >
+                  Generate secure passwords
+                </Title>
+                <Text
+                  style={{
+                    fontSize: "2.5rem",
+                  }}
+                >
+                  Keeping the same password for all websites is risky and then
+                  there is the task of remembering them. Safeguard generates new
+                  passwords everytime based on your desired level of strength.
+                </Text>
+                <img
+                src="https://res.cloudinary.com/matrimonal/image/upload/v1576402822/Screenshot_2019-12-14_at_6.48.26_PM_mq0gmd.png"
+                style={{
+                    width: "100%",
+                    padding: "5rem"
+                  }}
+                  alt=""
+                />
+              </Col>
+            </Row>
+           
           </div>
           <br />
           <div
@@ -379,6 +517,9 @@ export default class Signin extends Component {
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230099ff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
             }}
           >
+          <Row type="flex" justify="space-around" align="middle">
+              <Col lg={24} md={0} >
+
             <Row type="flex" justify="space-around" align="middle">
               <Col span={8} offset={2}>
                 <Title
@@ -416,6 +557,45 @@ export default class Signin extends Component {
                 />
               </Col>
             </Row>
+            </Col>
+            </Row>
+            <Row type="flex" justify="space-around" align="middle">
+              <Col lg={0} md={16} offset={1}>
+
+            
+                <Title
+                  style={{
+                    fontSize: "4rem",
+                    textAlign: "center",
+
+                  }}
+                >
+                  Decentralized and Secure
+                </Title>
+                <Text
+                  style={{
+                    fontSize: "2.5rem",
+                    textAlign: "center",
+                    
+                    marginTop: "4rem"
+                  }}
+                >
+                  We run only on Client-Side(Your Device). Hence you store all
+                  your data and safeguard don't store any of your passwords
+                </Text>
+              
+                <img
+                  style={{
+                    boxShadow: "0 0.5em 1.5em 0 rgba(0,0,0,.1)",
+                    width: "100%",
+                    verticalAlign: "middle",
+                    marginTop: "4rem"
+                  }}
+                  src="https://res.cloudinary.com/matrimonal/image/upload/v1576441724/Screenshot_2019-12-16_at_1.57.51_AM_dnbm4p.png"
+                />
+              </Col>
+            </Row>
+            
           </div>
           <div key="cards-section">
             <Row
